@@ -1,7 +1,8 @@
-// Cloudflare Worker: serves the built page and one API route.
-// The model key lives here as a secret, never in the browser.
+// Cloudflare Worker: the API behind the page. The page itself is on GitHub Pages (PAGE below);
+// the model key lives here as a secret, never in the browser.
 //
 //   POST /api/parse  { question }  ->  { draft, model, ms, cached? }
+//   anything else    ->  301 to the same path on the page
 //
 // The Worker only returns the model's raw draft. Checking it against the game happens in
 // shared code that the page runs, so a viewer sees exactly what the model said and what the
@@ -23,6 +24,11 @@ import type { Game } from '../src/shared/types.ts';
 
 export const LIMITS = { perMinute: 30, modelPerMinute: 10, modelPerDay: 100, modelTotalPerDay: 1500 };
 
+/** The public page. This Worker's own address only redirects there. */
+const PAGE = 'https://oskarikaile.github.io/ask-the-game/';
+/** Other sites whose pages may call the API (local dev calls it from the same origin). */
+const ALLOWED_ORIGINS = [new URL(PAGE).origin];
+
 // Minimal types for the bits of the Workers runtime used here (keeps the DOM types intact).
 interface DOStorage {
   get<T>(key: string): Promise<T | undefined>;
@@ -42,7 +48,6 @@ interface Env {
   /** tried when MODEL fails or times out; "" = no backup */
   FALLBACK_MODEL?: string;
   GUARD: DONamespace;
-  ASSETS: { fetch(req: Request): Promise<Response> };
 }
 
 interface Answer { draft: string; model: string; ms: number }
@@ -140,48 +145,67 @@ export class Guard {
 export default {
   async fetch(req: Request, env: Env, ctx: Ctx): Promise<Response> {
     const url = new URL(req.url);
-    // Static files are normally served before the Worker runs; this is the fallback.
-    if (url.pathname !== '/api/parse') return env.ASSETS.fetch(req);
-    if (req.method !== 'POST') return json({ error: 'Use POST.' }, 405);
+    if (url.pathname !== '/api/parse') return Response.redirect(new URL(url.pathname.slice(1) + url.search, PAGE).href, 301);
+
+    // Only the demo page may call the API from a browser: same origin (local dev) or the allowed sites.
     const origin = req.headers.get('origin');
-    if (origin && origin !== url.origin) return json({ error: 'Ask from the demo page.' }, 403);
+    const crossSite = origin !== null && origin !== url.origin;
+    if (crossSite && !ALLOWED_ORIGINS.includes(origin)) return json({ error: 'Ask from the demo page.' }, 403);
 
-    let question = '';
-    try {
-      question = String(((await req.json()) as { question?: unknown }).question ?? '').trim();
-    } catch {
-      return json({ error: 'Send JSON: { "question": "..." }' }, 400);
+    const res =
+      req.method === 'OPTIONS'
+        ? new Response(null, { status: 204 }) // the browser's CORS preflight for the JSON POST
+        : await answer(req, env, ctx);
+    if (crossSite) {
+      res.headers.set('access-control-allow-origin', origin);
+      res.headers.set('access-control-allow-methods', 'POST');
+      res.headers.set('access-control-allow-headers', 'content-type');
+      res.headers.set('access-control-max-age', '86400');
+      res.headers.set('vary', 'origin');
     }
-    if (!question) return json({ error: 'Ask a question first.' }, 400);
-    if (question.length > 300) return json({ error: 'Keep the question under 300 characters.' }, 400);
-
-    const model = env.MODEL || DEFAULT_MODEL;
-    const key = `${PROMPT_ID}|${model}|${normalize(question)}`;
-    const guard = env.GUARD.get(env.GUARD.idFromName('global'));
-    const ask = (body: object) => guard.fetch('https://guard/', { method: 'POST', body: JSON.stringify(body) });
-
-    const verdict = (await (await ask({ op: 'check', ip: visitor(req), key })).json()) as Verdict;
-    if ('deny' in verdict) return json({ error: verdict.deny }, 429);
-    if ('cached' in verdict) return json({ ...verdict.cached, cached: true });
-    if (!env.OPENROUTER_API_KEY) return json({ error: 'The model key is not set on the server.' }, 500);
-
-    const effort = env.MODEL ? env.MODEL_REASONING : DEFAULT_REASONING;
-    const fallback = env.FALLBACK_MODEL ?? FALLBACK_MODEL;
-    const tries = [{ model, reasoning: effort ? { effort } : undefined }];
-    if (fallback && fallback !== model) tries.push({ model: fallback, reasoning: undefined });
-
-    for (const t of tries) {
-      try {
-        const a = await draftFilter(question, game, { apiKey: env.OPENROUTER_API_KEY, ...t, timeoutMs: 10_000 });
-        const answer: Answer = { draft: a.text, model: a.model, ms: a.ms };
-        console.log(JSON.stringify({ question, ...answer, cost: a.cost }));
-        // only cache answers that are at least a JSON object, so one bad answer never sticks
-        if (!parseModelOutput(a.text).error) ctx.waitUntil(ask({ op: 'store', key, value: answer }));
-        return json(answer);
-      } catch (err) {
-        console.error(t.model, String(err));
-      }
-    }
-    return json({ error: 'The model did not answer. Try again, or edit the filter by hand.' }, 502);
+    return res;
   },
 };
+
+/** POST /api/parse: the Guard first (limits + cache), then the model, then the backup model. */
+async function answer(req: Request, env: Env, ctx: Ctx): Promise<Response> {
+  if (req.method !== 'POST') return json({ error: 'Use POST.' }, 405);
+
+  let question = '';
+  try {
+    question = String(((await req.json()) as { question?: unknown }).question ?? '').trim();
+  } catch {
+    return json({ error: 'Send JSON: { "question": "..." }' }, 400);
+  }
+  if (!question) return json({ error: 'Ask a question first.' }, 400);
+  if (question.length > 300) return json({ error: 'Keep the question under 300 characters.' }, 400);
+
+  const model = env.MODEL || DEFAULT_MODEL;
+  const key = `${PROMPT_ID}|${model}|${normalize(question)}`;
+  const guard = env.GUARD.get(env.GUARD.idFromName('global'));
+  const ask = (body: object) => guard.fetch('https://guard/', { method: 'POST', body: JSON.stringify(body) });
+
+  const verdict = (await (await ask({ op: 'check', ip: visitor(req), key })).json()) as Verdict;
+  if ('deny' in verdict) return json({ error: verdict.deny }, 429);
+  if ('cached' in verdict) return json({ ...verdict.cached, cached: true });
+  if (!env.OPENROUTER_API_KEY) return json({ error: 'The model key is not set on the server.' }, 500);
+
+  const effort = env.MODEL ? env.MODEL_REASONING : DEFAULT_REASONING;
+  const fallback = env.FALLBACK_MODEL ?? FALLBACK_MODEL;
+  const tries = [{ model, reasoning: effort ? { effort } : undefined }];
+  if (fallback && fallback !== model) tries.push({ model: fallback, reasoning: undefined });
+
+  for (const t of tries) {
+    try {
+      const a = await draftFilter(question, game, { apiKey: env.OPENROUTER_API_KEY, ...t, timeoutMs: 10_000 });
+      const result: Answer = { draft: a.text, model: a.model, ms: a.ms };
+      console.log(JSON.stringify({ question, ...result, cost: a.cost }));
+      // only cache answers that are at least a JSON object, so one bad answer never sticks
+      if (!parseModelOutput(a.text).error) ctx.waitUntil(ask({ op: 'store', key, value: result }));
+      return json(result);
+    } catch (err) {
+      console.error(t.model, String(err));
+    }
+  }
+  return json({ error: 'The model did not answer. Try again, or edit the filter by hand.' }, 502);
+}

@@ -1,6 +1,6 @@
 # Ask the game
 
-**Live:** https://ask-the-game.portawebia.workers.dev
+**Live:** https://oskarikaile.github.io/ask-the-game/
 
 A small hockey query demo: ask one real game a question in plain language and get the exact events
 back, on a rink and in the video. The game is **HPK 5–4 Ässät (OT), Liiga, 26 Sep 2026**, from
@@ -142,17 +142,20 @@ mistake on two of three runs. Full list in `evals/results.md`.
 ```bash
 npm install
 npm test              # 31 tests: data build, the check, the saved video sync, the ad offset
-npm run dev           # build + local Worker on http://localhost:4230 (key in .dev.vars)
+npm run dev           # page + API locally on http://localhost:4230 (key in .dev.vars)
 npm run eval          # model bake-off, needs OPENROUTER_API_KEY
 npm run data -- <gameId> <season>   # rebuild for another Liiga game
 npm run clips         # download the goal footage for the OCR (stays on your machine)
 npm run sync          # read the scoreboards, write src/data/clip-sync.json (ffmpeg + tesseract.js)
-npm run deploy
+npm run deploy        # the API (Cloudflare Worker); the page publishes itself on every push
 ```
 
-Stack: TypeScript, Vite, one Cloudflare Worker (static assets + `/api/parse`), OpenRouter. No
-framework. Fonts are bundled, so the page loads nothing from other sites until you open a clip,
-which streams from Liiga.
+Stack: TypeScript, Vite, OpenRouter, no framework. The page is static and lives on GitHub Pages:
+`.github/workflows/pages.yml` tests and builds it (`npm run build:pages`) on every push to `main`.
+Its only server part is one Cloudflare Worker (`worker/index.ts`): `POST /api/parse`, which holds
+the model key and accepts calls only from the page; any other path on the Worker redirects to the
+page. Fonts are bundled, so the page loads nothing from other sites until you ask a question (the
+Worker) or open a clip (Liiga).
 
 **Spam and cost guard.** Every question passes one Durable Object (`Guard` in `worker/index.ts`),
 a single counter for the whole world, so the limits are exact however many connections a script

@@ -7,8 +7,9 @@
   "scripts": {
     "data": "node scripts/build-game.ts",
     "build": "tsc --noEmit && vite build",
-    "dev": "vite build && wrangler dev --port 4230",
-    "deploy": "npm run build && wrangler deploy",
+    "build:pages": "tsc --noEmit && vite build --mode pages",
+    "dev": "vite build && wrangler dev --assets dist --port 4230",
+    "deploy": "tsc --noEmit && wrangler deploy",
     "test": "vitest run",
     "eval": "node evals/run.ts",
     "clips": "node scripts/fetch-clips.ts",

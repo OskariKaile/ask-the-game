@@ -37,11 +37,11 @@ export function renderAbout() {
   $('#legend-home').innerHTML = `<i style="background:${home.color}"></i><b>${esc(home.name)}</b> shoots →`;
   $('#legend-away').innerHTML = `<i style="background:${away.color}"></i>← <b>${esc(away.name)}</b> shoots`;
 
-  // Liiga's live URL next to the copy this site keeps (public/liiga/<id>/)
+  // Liiga's live URL next to the copy this site keeps (public/liiga/<id>/, under the page's base path)
   const [urlGame, urlShots, urlStats] = game.source.urls;
   const feed = (url: string, copy: string) =>
     `<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(url.replace(/^https:\/\//, ''))} ↗</a>
-     <a class="copy" href="/liiga/${esc(game.id)}/${copy}.json" target="_blank">copy here ↗</a>`;
+     <a class="copy" href="${import.meta.env.BASE_URL}liiga/${esc(game.id)}/${copy}.json" target="_blank">copy here ↗</a>`;
   const pp = game.source.ppCheck;
 
   $('#source').innerHTML = `

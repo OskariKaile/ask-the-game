@@ -37,7 +37,7 @@ async function ask(q: string) {
   apiError = '';
   render();
   try {
-    const res = await fetch('/api/parse', {
+    const res = await fetch(`${__API_ORIGIN__}/api/parse`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ question }),
