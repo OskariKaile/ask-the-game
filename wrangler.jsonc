@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ask-the-game",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-10-01",
+  "assets": { "directory": "./dist", "binding": "ASSETS" },
+  // The model, its reasoning effort and the backup model are set in src/shared/llm.ts.
+  // To try another without a code change, add vars MODEL / MODEL_REASONING / FALLBACK_MODEL here.
+  // One global "Guard" counts every question (exact limits + daily cap) and caches answers.
+  // SQLite-backed Durable Objects are on the Workers free plan.
+  "durable_objects": { "bindings": [{ "name": "GUARD", "class_name": "Guard" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Guard"] }],
+  "observability": { "enabled": true }
+}

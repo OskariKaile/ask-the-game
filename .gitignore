@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.wrangler/
+.dev.vars
+evals/.cache/
+
+# goal clips (170 MB): recreate with `npm run clips`
+public/clips/
+.cache/

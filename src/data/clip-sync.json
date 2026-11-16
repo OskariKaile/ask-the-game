@@ -1,0 +1,331 @@
+[
+ {
+  "id": "676f4c08-1d5a-49bb-9d38-a237b9a38a55",
+  "event": "e9",
+  "frames": 240,
+  "clockReads": 57,
+  "used": 45,
+  "periodLength": 1200,
+  "offset": 903.63,
+  "goalAt": 10.13,
+  "live": [
+   0,
+   11
+  ],
+  "stop": "exact",
+  "checks": [
+   {
+    "level": "ok",
+    "text": "Clock read in 57 of 240 frames; 45 fit a clock running 1 s per video second (10 digit flips timed)."
+   },
+   {
+    "level": "ok",
+    "text": "Clock stops at 14:54: exactly Liiga's goal time, P1 5:06."
+   },
+   {
+    "level": "ok",
+    "text": "Period on screen \"1.\" = P1."
+   },
+   {
+    "level": "ok",
+    "text": "Score on screen before the goal 0–0 = Liiga's."
+   },
+   {
+    "level": "ok",
+    "text": "Score on screen changes to 1–0 after the goal."
+   },
+   {
+    "level": "ok",
+    "text": "Strip on screen \"5 VS 4\" matches my PP 5v4 label."
+   }
+  ]
+ },
+ {
+  "id": "9f631d6a-a5b1-43dd-84e5-fcf7f9c74246",
+  "event": "e10",
+  "frames": 240,
+  "clockReads": 50,
+  "used": 38,
+  "periodLength": 1200,
+  "offset": 870.38,
+  "goalAt": 9.88,
+  "live": [
+   0,
+   9.25
+  ],
+  "stop": "exact",
+  "checks": [
+   {
+    "level": "ok",
+    "text": "Clock read in 50 of 240 frames; 38 fit a clock running 1 s per video second (9 digit flips timed)."
+   },
+   {
+    "level": "ok",
+    "text": "Clock stops at 14:21: exactly Liiga's goal time, P1 5:39."
+   },
+   {
+    "level": "ok",
+    "text": "Period on screen \"1.\" = P1."
+   },
+   {
+    "level": "ok",
+    "text": "Score on screen before the goal 1–0 = Liiga's."
+   }
+  ]
+ },
+ {
+  "id": "3d9bf53a-7382-4323-9588-6f461632bb52",
+  "event": "e25",
+  "frames": 240,
+  "clockReads": 57,
+  "used": 42,
+  "periodLength": 1200,
+  "offset": 299.88,
+  "goalAt": 9.38,
+  "live": [
+   0,
+   10.25
+  ],
+  "stop": "exact",
+  "checks": [
+   {
+    "level": "ok",
+    "text": "Clock read in 57 of 240 frames; 42 fit a clock running 1 s per video second (9 digit flips timed)."
+   },
+   {
+    "level": "ok",
+    "text": "Clock stops at 4:51: exactly Liiga's goal time, P1 15:09."
+   },
+   {
+    "level": "ok",
+    "text": "Period on screen \"1.\" = P1."
+   },
+   {
+    "level": "ok",
+    "text": "Score on screen before the goal 2–0 = Liiga's."
+   }
+  ]
+ },
+ {
+  "id": "0ad8c23e-a4b6-419e-b086-34f7775b5ee8",
+  "event": "e39",
+  "frames": 240,
+  "clockReads": 62,
+  "used": 38,
+  "periodLength": 1200,
+  "offset": 793.88,
+  "goalAt": 8.38,
+  "live": [
+   0,
+   9.25
+  ],
+  "stop": "exact",
+  "checks": [
+   {
+    "level": "ok",
+    "text": "Clock read in 62 of 240 frames; 38 fit a clock running 1 s per video second (8 digit flips timed)."
+   },
+   {
+    "level": "ok",
+    "text": "Clock stops at 13:06: exactly Liiga's goal time, P2 6:54."
+   },
+   {
+    "level": "ok",
+    "text": "Period on screen \"2.\" = P2."
+   },
+   {
+    "level": "ok",
+    "text": "Score on screen before the goal 2–1 = Liiga's."
+   },
+   {
+    "level": "ok",
+    "text": "Score on screen changes to 2–2 after the goal."
+   }
+  ]
+ },
+ {
+  "id": "568dd378-c692-4382-b8de-f376b2f0f8d1",
+  "event": "e42",
+  "frames": 240,
+  "clockReads": 35,
+  "used": 26,
+  "periodLength": 1200,
+  "offset": 680.38,
+  "goalAt": 9.88,
+  "live": [
+   0,
+   9.25
+  ],
+  "stop": "not-visible",
+  "checks": [
+   {
+    "level": "ok",
+    "text": "Clock read in 35 of 240 frames; 26 fit a clock running 1 s per video second (4 digit flips timed)."
+   },
+   {
+    "level": "note",
+    "text": "The scoreboard leaves the screen at 11:12, right before Liiga's goal time (11:11 left), so the stop itself isn't visible."
+   },
+   {
+    "level": "ok",
+    "text": "Period on screen \"2.\" = P2."
+   },
+   {
+    "level": "ok",
+    "text": "Score on screen before the goal 2–2 = Liiga's."
+   }
+  ]
+ },
+ {
+  "id": "e5345bca-151a-4f10-a277-6187c7d13d48",
+  "event": "e70",
+  "frames": 240,
+  "clockReads": 41,
+  "used": 24,
+  "periodLength": 1200,
+  "offset": 829.63,
+  "goalAt": 10.13,
+  "live": [
+   5.25,
+   11
+  ],
+  "stop": "exact",
+  "checks": [
+   {
+    "level": "ok",
+    "text": "Clock read in 41 of 240 frames; 24 fit a clock running 1 s per video second (5 digit flips timed)."
+   },
+   {
+    "level": "ok",
+    "text": "Clock stops at 13:40: exactly Liiga's goal time, P3 6:20."
+   },
+   {
+    "level": "ok",
+    "text": "Period on screen \"3.\" = P3."
+   },
+   {
+    "level": "ok",
+    "text": "Score on screen before the goal 3–2 = Liiga's."
+   },
+   {
+    "level": "ok",
+    "text": "Score on screen changes to 4–2 after the goal."
+   },
+   {
+    "level": "note",
+    "text": "17 clock readings didn't fit the running clock (stopped clock or misreads) and were ignored."
+   }
+  ]
+ },
+ {
+  "id": "864419e8-5f74-4e5a-a1fd-b13270c4936a",
+  "event": "e97",
+  "frames": 240,
+  "clockReads": 58,
+  "used": 47,
+  "periodLength": 1200,
+  "offset": 284.13,
+  "goalAt": 10.63,
+  "live": [
+   0,
+   11.5
+  ],
+  "stop": "exact",
+  "checks": [
+   {
+    "level": "ok",
+    "text": "Clock read in 58 of 240 frames; 47 fit a clock running 1 s per video second (11 digit flips timed)."
+   },
+   {
+    "level": "ok",
+    "text": "Clock stops at 4:34: exactly Liiga's goal time, P3 15:26."
+   },
+   {
+    "level": "ok",
+    "text": "Period on screen \"3.\" = P3."
+   },
+   {
+    "level": "ok",
+    "text": "Score on screen before the goal 4–2 = Liiga's."
+   },
+   {
+    "level": "ok",
+    "text": "Score on screen changes to 4–3 after the goal."
+   },
+   {
+    "level": "ok",
+    "text": "Strip on screen \"5 VS 3\" matches my PP 5v3 label."
+   }
+  ]
+ },
+ {
+  "id": "18812520-2146-4114-bc49-685b12dc1fc1",
+  "event": "e98",
+  "frames": 240,
+  "clockReads": 56,
+  "used": 43,
+  "periodLength": 1200,
+  "offset": 156.13,
+  "goalAt": 9.63,
+  "live": [
+   0,
+   10.5
+  ],
+  "stop": "exact",
+  "checks": [
+   {
+    "level": "ok",
+    "text": "Clock read in 56 of 240 frames; 43 fit a clock running 1 s per video second (10 digit flips timed)."
+   },
+   {
+    "level": "ok",
+    "text": "Clock stops at 2:27: exactly Liiga's goal time, P3 17:33."
+   },
+   {
+    "level": "ok",
+    "text": "Period on screen \"3.\" = P3."
+   },
+   {
+    "level": "ok",
+    "text": "Score on screen before the goal 4–3 = Liiga's."
+   },
+   {
+    "level": "ok",
+    "text": "Strip on screen \"Tyhjä maali\" (empty net) matches my goalie-pulled label."
+   }
+  ]
+ },
+ {
+  "id": "174cecdc-2326-402a-b85e-4b97f8d3d2b1",
+  "event": "e110",
+  "frames": 240,
+  "clockReads": 43,
+  "used": 32,
+  "periodLength": 300,
+  "offset": 75.38,
+  "goalAt": 8.88,
+  "live": [
+   0,
+   9.75
+  ],
+  "stop": "exact",
+  "checks": [
+   {
+    "level": "ok",
+    "text": "Clock read in 43 of 240 frames; 32 fit a clock running 1 s per video second (5 digit flips timed)."
+   },
+   {
+    "level": "ok",
+    "text": "Clock stops at 1:07: exactly Liiga's goal time, OT 3:53."
+   },
+   {
+    "level": "ok",
+    "text": "Period on screen \"JA\" = OT."
+   },
+   {
+    "level": "ok",
+    "text": "Score on screen before the goal 4–4 = Liiga's."
+   }
+  ]
+ }
+]

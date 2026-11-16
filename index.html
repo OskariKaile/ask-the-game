@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#04060a" />
+    <title>Ask the game</title>
+    <meta name="description" content="Ask one hockey game a question in plain language. An LLM drafts a filter, code checks it against the real game data, then the search runs." />
+    <link rel="author" href="https://oskarikaile.github.io/" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='5' y='5' width='22' height='22' rx='4' fill='none' stroke='%2300ffcc' stroke-width='5'/%3E%3C/svg%3E" />
+  </head>
+  <body>
+    <div class="sky" aria-hidden="true"></div>
+
+    <header class="wrap top">
+      <div class="intro">
+        <div class="brand">
+          <svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true">
+            <rect x="5" y="5" width="22" height="22" rx="4" fill="none" stroke="currentColor" stroke-width="5" />
+          </svg>
+          <div>
+            <p class="eyebrow">Hockey query demo</p>
+            <h1>Ask the game</h1>
+            <p class="brand__sub"><a href="https://oskarikaile.github.io/" target="_blank" rel="noopener noreferrer">By Oskari Kaile</a></p>
+          </div>
+        </div>
+        <p class="lede">
+          Ask one real Liiga game a question in plain language. The model only turns your words into a filter.
+          <em>Plain code</em> then checks every value against the game data and runs the search, so nothing in the
+          answer comes from the model.
+        </p>
+      </div>
+      <aside class="hud hud--key" aria-label="The game">
+        <h2 class="hud__head">Game feed</h2>
+        <dl id="game" class="hud__list"></dl>
+      </aside>
+    </header>
+
+    <main class="wrap">
+      <section class="ask-box hud hud--key" aria-label="Ask a question">
+        <h2 class="hud__head">Query</h2>
+        <form id="ask">
+          <div class="field">
+            <input id="q" type="text" maxlength="300" autocomplete="off" placeholder="e.g. Ässät power play shots in the third" aria-label="Your question" />
+          </div>
+          <button id="ask-btn" class="btn" type="submit">Ask</button>
+        </form>
+        <div class="ex-row"><span>Try</span><div id="examples" class="ex-list"></div></div>
+        <div class="ex-row break"><span>Try to break it</span><div id="break" class="ex-list"></div></div>
+      </section>
+
+      <section class="pipeline" aria-label="How the question was handled">
+        <article class="hud">
+          <h2 class="hud__head"><span class="n">01</span> Model draft</h2>
+          <div id="step-model"></div>
+        </article>
+        <article class="hud">
+          <h2 class="hud__head"><span class="n">02</span> Code check</h2>
+          <div id="step-check"></div>
+        </article>
+        <article class="hud">
+          <h2 class="hud__head"><span class="n">03</span> Searched for</h2>
+          <div id="step-search"></div>
+        </article>
+      </section>
+
+      <section class="results" aria-label="Results">
+        <div class="rink-box hud">
+          <h2 class="hud__head">Rink</h2>
+          <svg id="rink" role="img" aria-label="Rink with the matching shots"></svg>
+          <div class="legend">
+            <span id="legend-home"></span><span id="legend-away"></span>
+            <span><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="5" fill="#8090a3" /><circle cx="10" cy="10" r="8" fill="none" stroke="#8090a3" stroke-width="2" /></svg>goal</span>
+            <span><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7" fill="#8090a3" fill-opacity=".78" /></svg>saved</span>
+            <span><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="6" fill="#04060a" stroke="#8090a3" stroke-width="2.5" /></svg>missed</span>
+            <span><svg viewBox="0 0 20 20"><path d="M5 5 L15 15 M15 5 L5 15" stroke="#8090a3" stroke-width="3" stroke-linecap="round" /></svg>blocked</span>
+            <span>bigger = higher xG</span>
+          </div>
+          <p id="rink-note" class="muted small"></p>
+          <p id="onice-note" class="small onice-note" hidden></p>
+        </div>
+        <div class="list-box hud">
+          <div class="hud__head">
+            <h2>Matching events</h2>
+            <span class="grow"></span>
+            <button id="export" class="btn btn--cyan btn--sm" title="Period, clock and a clip window (8 s before, 4 s after) for every event">Clip list CSV</button>
+          </div>
+          <ol id="list"></ol>
+        </div>
+      </section>
+    </main>
+
+    <footer class="wrap foot">
+      <section class="hud" aria-label="How it works">
+        <h2 class="hud__head">How it works</h2>
+        <ol>
+          <li><span><b>Draft.</b> A small LLM, behind a Cloudflare Worker so the key never reaches the browser, turns the question into a JSON filter. It knows the two teams and the periods, but not the roster or a single event.</span></li>
+          <li><span><b>Check.</b> TypeScript resolves every value against the game: players by name, number or a close typo, event types, periods, clock times, strength. Anything that doesn't exist stops the search and says why, with a "did you mean" fix. Auto-corrections are shown, never silent.</span></li>
+          <li><span><b>Search.</b> Plain filtering over the game's events. Counts, xG totals and the rink come from the data only.</span></li>
+          <li><span><b>Video sync.</b> <span id="how-video"></span></span></li>
+        </ol>
+      </section>
+      <section id="data" class="hud" aria-label="Where the data comes from">
+        <h2 class="hud__head">Data source</h2>
+        <div id="source"></div>
+      </section>
+    </footer>
+
+    <dialog id="clip-dialog" class="hud hud--key" aria-label="Goal clip">
+      <video id="clip-video" controls playsinline></video>
+      <p id="clip-msg" class="err clip-msg" hidden></p>
+      <section id="clip-sync" class="sync" aria-label="Video synced to the game clock" hidden>
+        <div class="sync-head">
+          <div class="sync-now">
+            <small>Game clock, read from the video</small>
+            <b id="sync-now">–</b>
+            <span id="sync-state" class="sync-state"></span>
+          </div>
+          <button id="sync-goal" class="btn btn--sm"></button>
+        </div>
+        <div id="sync-events" class="sync-events" aria-label="Events in this clip"></div>
+        <details class="sync-checks">
+          <summary id="sync-summary"></summary>
+          <ul id="sync-checks" class="checks"></ul>
+        </details>
+      </section>
+      <div class="row"><span class="small muted">Official goal clip · Liiga</span><button id="clip-close" class="btn btn--cyan btn--sm">Close</button></div>
+    </dialog>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

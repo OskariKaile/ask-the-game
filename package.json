@@ -1,0 +1,30 @@
+{
+  "name": "ask-the-game",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Ask one hockey game a question in plain language. An LLM drafts a filter, plain code checks it against the real game data, then the search runs.",
+  "scripts": {
+    "data": "node scripts/build-game.ts",
+    "build": "tsc --noEmit && vite build",
+    "dev": "vite build && wrangler dev --port 4230",
+    "deploy": "npm run build && wrangler deploy",
+    "test": "vitest run",
+    "eval": "node evals/run.ts",
+    "clips": "node scripts/fetch-clips.ts",
+    "sync": "node scripts/sync-clips.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "tesseract.js": "7.0.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.8",
+    "vitest": "^5.1.0",
+    "wrangler": "^4.162.0"
+  },
+  "dependencies": {
+    "@fontsource/eb-garamond": "5.3.0",
+    "@fontsource/jetbrains-mono": "5.3.0",
+    "hls.js": "^1.7.4"
+  }
+}
