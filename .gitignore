@@ -4,6 +4,5 @@ dist/
 .dev.vars
 evals/.cache/
 
-# goal clips (170 MB): recreate with `npm run clips`
-public/clips/
+# OCR working files and the goal footage it reads (176 MB, `npm run clips`); never deployed
 .cache/

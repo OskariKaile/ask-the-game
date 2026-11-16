@@ -2,8 +2,17 @@
 //
 // While the game clock runs it drops one second per video second, so one number per clip ties
 // the two together: offset = remaining period seconds + video seconds.
+//
+// "Video seconds" count from the first frame of the goal footage. Liiga's stream puts a short
+// pre-roll ad in front of it, so in the player: stream time = adEnd + video second.
 
 import type { ClipSync, Game, GameEvent } from './types.ts';
+
+/**
+ * Where the pre-roll ad ends in Liiga's stream: the start of the first piece of video after the
+ * stream's first discontinuity (HLS counts them in `cc`). 0 when the stream has no ad.
+ */
+export const adEnd = (fragments: { cc: number; start: number }[]) => fragments.find((f) => f.cc > 0)?.start ?? 0;
 
 /**
  * Video second at which the game clock showed `clock` (seconds elapsed in the period).

@@ -161,10 +161,13 @@ export interface CheckResult {
   draft: DraftFilter;
 }
 
-/** One goal clip tied to the game clock by reading the scoreboard (scripts/sync-clips.ts). */
+/**
+ * One goal clip tied to the game clock by reading the scoreboard (scripts/sync-clips.ts).
+ * "Video seconds" count from the first frame of the goal footage, i.e. after Liiga's pre-roll ad.
+ */
 export interface SyncCheck { level: 'ok' | 'note' | 'error'; text: string }
 export interface ClipSync {
-  /** clip id (the UUID in Liiga's clip URL and under public/clips/) */
+  /** clip id (the UUID in Liiga's clip URL) */
   id: string;
   /** the goal event this clip shows */
   event: string;

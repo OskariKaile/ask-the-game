@@ -3,7 +3,13 @@
 **Live:** https://ask-the-game.portawebia.workers.dev
 
 A small hockey query demo: ask one real game a question in plain language and get the exact events
-back. The game is **HPK 5–4 Ässät (OT), Liiga, 26 Sep 2026**, from Liiga's public game feed.
+back, on a rink and in the video. The game is **HPK 5–4 Ässät (OT), Liiga, 26 Sep 2026**, from
+Liiga's public game feed. **Video sync:** an OCR model (Tesseract) read the broadcast scoreboard in
+every goal clip and plain code checked each reading against the feed, so a clip plays with the game
+clock beside it and an event opens at its second (9/9 clips synced; in 8 the clock stops on Liiga's
+exact goal second).
+
+![The clip player: the game clock read from the broadcast scoreboard (01:08 left in OT = 3:52), and the events inside the clip](docs/clip-player.jpg)
 
 Type a question like *"Ässät power play shots in the third"*, *"every goal #94 was involved in"* or
 *"Ässät:n maalit kuudella viittä vastaan"*. You get the matching events as a list, plotted on a rink,
@@ -60,6 +66,12 @@ It ran once, offline; the page only reads the saved JSON. In the clip player you
 follow the video, a jump to the goal, and every other event inside the clip (three shots right
 before goals get their own **▶ Video** button). The CSV export carries the clip and the second.
 
+The player streams each clip from Liiga exactly as Liiga serves it, pre-roll ad included. The sync
+times count from the end of the ad, so the player adds the ad's length, which hls.js reads from the
+playlist: the start of the first piece of video after the discontinuity (`adEnd` in
+`src/shared/sync.ts`). Checked on Liiga's stream in the browser: the scoreboard's digits flip within
+0.2 s of where the sync puts the flip.
+
 ## What the check catches
 
 | Question | What happens |
@@ -87,12 +99,10 @@ live in `public/liiga/<gameId>/`, so the build is reproducible offline and the s
 copy: the "Data source" panel links both Liiga's live URLs and these copies. Answering a question
 never touches Liiga's servers.
 
-The 9 official goal clips are copied too: `npm run clips` (`scripts/fetch-clips.ts`, needs ffmpeg)
-downloads each 720p clip without its pre-roll ad and cuts it, without re-encoding, into HLS under
-`public/clips/<id>/` (6-second pieces + poster). HLS instead of one MP4 because Cloudflare's static
-assets ignore Range requests, so an MP4 couldn't seek and wouldn't play on iPhones. The player uses
-this copy first, Liiga's own stream as a fallback, and says so plainly if both fail. The clips
-(175 MB) are git-ignored; the script recreates them.
+The 9 official goal clips are not copied onto the site: the player streams them from Liiga's video
+service and says so plainly if one fails to load. Only the offline OCR needs the footage itself:
+`npm run clips` (`scripts/fetch-clips.ts`) downloads each clip's 720p goal footage to
+`.cache/clips/` on your machine (176 MB, git-ignored, never deployed).
 
 - **Shots** (saved, missed, blocked, goals) with rink position, xG and, for 89 of the 103 shots, the positions of all
   12 players when the shot was taken. Click a shot to see them.
@@ -131,17 +141,18 @@ mistake on two of three runs. Full list in `evals/results.md`.
 
 ```bash
 npm install
-npm test              # 28 tests: data build, the check, the saved video sync
+npm test              # 31 tests: data build, the check, the saved video sync, the ad offset
 npm run dev           # build + local Worker on http://localhost:4230 (key in .dev.vars)
 npm run eval          # model bake-off, needs OPENROUTER_API_KEY
 npm run data -- <gameId> <season>   # rebuild for another Liiga game
-npm run clips         # copy the goal clips (needs ffmpeg)
+npm run clips         # download the goal footage for the OCR (stays on your machine)
 npm run sync          # read the scoreboards, write src/data/clip-sync.json (ffmpeg + tesseract.js)
 npm run deploy
 ```
 
 Stack: TypeScript, Vite, one Cloudflare Worker (static assets + `/api/parse`), OpenRouter. No
-framework. Fonts are bundled, so the page loads nothing from other sites.
+framework. Fonts are bundled, so the page loads nothing from other sites until you open a clip,
+which streams from Liiga.
 
 **Spam and cost guard.** Every question passes one Durable Object (`Guard` in `worker/index.ts`),
 a single counter for the whole world, so the limits are exact however many connections a script

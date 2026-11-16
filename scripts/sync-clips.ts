@@ -3,7 +3,8 @@
 //   node scripts/sync-clips.ts            (after `npm run clips`; needs ffmpeg on PATH)
 //   node scripts/sync-clips.ts --fresh    (ignore cached OCR results)
 //
-// 1. ffmpeg samples 4 frames per second from our copy of each clip and crops the scoreboard:
+// 1. ffmpeg samples 4 frames per second from the downloaded goal footage (.cache/clips, see
+//    scripts/fetch-clips.ts) and crops the scoreboard:
 //    clock, period, score and the strip below it ("5 VS 3", "Ässät | Tyhjä maali").
 // 2. Tesseract, an LSTM neural-network OCR (tesseract.js, runs locally), reads every crop.
 // 3. Plain code checks the readings, the same way the filter check treats the language model:
@@ -21,7 +22,7 @@ import type { ClipSync, Game, GameEvent, SyncCheck } from '../src/shared/types.t
 
 const FPS = 4;
 const SLOW_EVERY = 4; // period, score and strip are read once a second
-const CLIPS = 'public/clips';
+const CLIPS = '.cache/clips';
 const CACHE = '.cache/sync';
 const fresh = process.argv.includes('--fresh');
 
@@ -60,7 +61,7 @@ function extract(id: string, dir: string) {
   });
   const graph = `[0:v]fps=${FPS},split=${fields.length}${fields.map((_, i) => `[v${i}]`).join('')};${chains.join(';')}`;
   execFileSync('ffmpeg', [
-    '-v', 'error', '-y', '-i', `${CLIPS}/${id}/index.m3u8`, '-filter_complex', graph,
+    '-v', 'error', '-y', '-i', `${CLIPS}/${id}.ts`, '-filter_complex', graph,
     ...fields.flatMap((f) => ['-map', `[${f}]`, `${dir}/${f}_%04d.png`]),
   ]);
 }
@@ -236,7 +237,7 @@ await worker.setParameters({ debug_file: '/dev/null' } as Record<string, string>
 const result: ClipSync[] = [];
 for (const goal of goals) {
   const id = clipId(goal);
-  if (!existsSync(`${CLIPS}/${id}/index.m3u8`)) {
+  if (!existsSync(`${CLIPS}/${id}.ts`)) {
     console.warn(`! ${id}: no local clip (run npm run clips)`);
     continue;
   }

@@ -57,12 +57,13 @@ export function renderAbout() {
       ['Stats', `${feed(urlStats, 'stats')}<span>Goalie time on ice per period, to know who was in net for each shot.</span>`],
       [
         'Clips',
-        `videos.liiga.fi<span>The ${game.events.filter((e) => e.clip).length} official goal clips, copied onto this site (scripts/fetch-clips.ts). Liiga's own stream is the fallback.</span>`,
+        `videos.liiga.fi<span>The ${game.events.filter((e) => e.clip).length} official goal clips, played straight from Liiga's video service, pre-roll ad included.</span>`,
       ],
       [
         'Video sync',
-        `scripts/sync-clips.ts<span>Read the scoreboard in our copies of the clips with Tesseract OCR, once, and saved the result
-        (src/data/clip-sync.json): ${synced.length} of ${syncs.length} clips synced to the game clock, ${syncFailures} failed checks.</span>`,
+        `scripts/sync-clips.ts<span>Read the scoreboard in the goal clips with Tesseract OCR, once, offline, and saved the result
+        (src/data/clip-sync.json): ${synced.length} of ${syncs.length} clips synced to the game clock, ${syncFailures} failed checks.
+        The player shifts these times by the length of Liiga's ad, read from the stream.</span>`,
       ],
       [
         'My code',

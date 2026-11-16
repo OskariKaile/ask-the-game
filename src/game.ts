@@ -37,7 +37,7 @@ export function describeEvent(e: GameEvent): string {
   return `${periodLabel(e.period)} ${fmtClock(e.clock)} · ${game.teams[e.side].name} ${what(e)} · ${playerName(e.player)}${xg}`;
 }
 
-/** Every event that can be seen in a synced goal clip: which clip, and at what video second. */
+/** Every event that can be seen in a synced goal clip: Liiga's clip URL, and the video second (after the ad). */
 export const inClip = new Map<string, { sync: ClipSync; url: string; at: number }>();
 for (const sync of syncs) {
   const goal = game.events.find((e) => e.id === sync.event);

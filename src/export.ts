@@ -15,8 +15,8 @@ const HEADER = [
   'player',
   'situation',
   'xg',
-  'video_clip', // the goal clip the event can be seen in (scoreboard sync), if any
-  'video_s',
+  'video_clip', // Liiga's goal clip the event can be seen in (scoreboard sync), if any
+  'video_s_after_ad', // seconds into that clip, counted from the end of Liiga's pre-roll ad
 ];
 
 const cell = (v: string) => (/[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v);
@@ -36,7 +36,7 @@ export function downloadClipList(events: GameEvent[]) {
       playerName(e.player),
       `${e.strength} ${e.manpower}`,
       e.xg?.toFixed(3) ?? '',
-      seen ? `/clips/${seen.sync.id}/index.m3u8` : '',
+      seen?.url ?? '',
       seen ? String(seen.at) : '',
     ]);
   }

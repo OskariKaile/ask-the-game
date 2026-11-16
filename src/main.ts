@@ -254,7 +254,7 @@ function listRow(e: GameEvent): string {
   const video = e.clip
     ? `<button class="clip btn btn--cyan btn--sm" data-clip="${esc(e.clip.url)}" aria-label="Play the goal clip">▶ Clip</button>`
     : seen
-      ? `<button class="clip btn btn--cyan btn--sm" data-clip="${esc(seen.url)}" data-at="${seen.at}" title="Seen ${seen.at} s into a goal clip (synced from the scoreboard clock)">▶ Video</button>`
+      ? `<button class="clip btn btn--cyan btn--sm" data-clip="${esc(seen.url)}" data-at="${seen.at}" title="Seen in a goal clip, ${seen.at} s after Liiga's pre-roll ad (synced from the scoreboard clock)">▶ Video</button>`
       : '';
 
   return `<li data-row="${e.id}" class="${e.id === selected ? 'sel' : ''}${e.id === hovered ? ' hl' : ''} ${e.type}" tabindex="0">
